@@ -1,0 +1,118 @@
+<!DOCTYPE html>  <html> <head>   <title>docs.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="completion.html">                 completion.js               </a>                                           <a class="source" href="config.html">                 config.js               </a>                                           <a class="source" href="docs.html">                 docs.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               docs.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">),</span>
+  <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">),</span>
+  <span class="nx">spawn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;child_process&#39;</span><span class="p">).</span><span class="nx">spawn</span><span class="p">,</span>
+  <span class="nx">Ronn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;ronn&#39;</span><span class="p">).</span><span class="nx">Ronn</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Output documentation, generated from source files or markdown directly.</p>
+
+<p>This file is a special task file which uses <a href="https://github.com/kapouer/ronnjs">ronnjs</a> to
+automatically generate manpage from the source file.</p>
+
+<p>It will basically output the comments of a source file, originally done to be docco compliant,
+using <code>man</code>. The source files are parsed and their markdown content is runned through ronnjs,
+then executed through the <code>man</code> executable.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>known markdown extensions</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">markdowns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.md&#39;</span><span class="p">,</span> <span class="s1">&#39;.markdown&#39;</span><span class="p">,</span> <span class="s1">&#39;.mkd&#39;</span><span class="p">],</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>the reg used to parse markdown from source files</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">matcher</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">coffee</span><span class="o">:</span> <span class="sr">/^\s*#\s?/</span><span class="p">,</span>
+    <span class="nx">js</span><span class="o">:</span> <span class="sr">/^\s*\/\/\s?/</span>
+  <span class="p">};</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>the snippet of markdown that is prepended on each file generation.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">manfront</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s2">&quot;:cmd-:page(1) -- documentation for :page&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;==========================================================================================================&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;## :page \n&quot;</span>
+<span class="p">].</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">);</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h3>help</h3>
+
+<p>Output documentation, generated from source files or markdown directly.
+If file is not a markdown extension, file content is parsed if the extension
+is known (js or coffee) and comments written in markdown are used to
+generate the man page.</p>
+
+<p>The cmd parameter is used only to escape the manfront that is prepended on
+each file generation.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">exports</span><span class="p">.</span><span class="nx">help</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="nx">cmd</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">extname</span> <span class="o">=</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">file</span><span class="p">),</span>
+    <span class="nx">basename</span> <span class="o">=</span> <span class="nx">path</span><span class="p">.</span><span class="nx">basename</span><span class="p">(</span><span class="nx">file</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="nx">extname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+    <span class="nx">md</span> <span class="o">=</span> <span class="o">!!~</span><span class="nx">markdowns</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">extname</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="nx">basename</span> <span class="o">===</span> <span class="s1">&#39;Cakefile&#39;</span><span class="p">)</span> <span class="nx">extname</span> <span class="o">=</span> <span class="s1">&#39;.coffee&#39;</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">cb</span> <span class="o">=</span> <span class="nx">cmd</span><span class="p">;</span>
+    <span class="nx">cmd</span> <span class="o">=</span> <span class="s1">&#39;manman&#39;</span><span class="p">;</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>noop if no callback supplied</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">cb</span> <span class="o">=</span> <span class="nx">cb</span> <span class="o">||</span> <span class="kd">function</span><span class="p">(){};</span>
+
+  <span class="nx">path</span><span class="p">.</span><span class="nx">exists</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">state</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cb</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">file</span> <span class="o">+</span> <span class="s1">&#39; does not exist.&#39;</span><span class="p">));</span>
+
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">content</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cb</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">ronn</span> <span class="o">=</span> <span class="nx">md</span> <span class="o">?</span> <span class="nx">parseMd</span><span class="p">(</span><span class="nx">content</span><span class="p">)</span> <span class="o">:</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">extname</span><span class="p">,</span> <span class="nx">content</span><span class="p">);</span>
+      <span class="nx">man</span><span class="p">(</span><span class="nx">ronn</span><span class="p">,</span> <span class="p">{</span> <span class="nx">page</span><span class="o">:</span> <span class="nx">basename</span><span class="p">,</span> <span class="nx">cmd</span><span class="o">:</span> <span class="nx">cmd</span> <span class="p">},</span> <span class="nx">cb</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="kd">function</span> <span class="nx">handleFront</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">front</span> <span class="o">=</span> <span class="nx">tmpl</span><span class="p">(</span><span class="nx">manfront</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">front</span> <span class="o">+</span> <span class="nx">input</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">tmpl</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span><span class="nx">d</span><span class="p">){</span><span class="k">return</span> <span class="nx">s</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/:([a-z]+)/g</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span><span class="nx">m</span><span class="p">){</span><span class="k">return</span> <span class="nx">d</span><span class="p">[</span><span class="nx">m</span><span class="p">];});}</span>
+
+<span class="kd">function</span> <span class="nx">man</span><span class="p">(</span><span class="nx">output</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">ronn</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Ronn</span><span class="p">(</span><span class="nx">handleFront</span><span class="p">(</span><span class="nx">output</span><span class="p">,</span> <span class="nx">options</span><span class="p">)),</span>
+    <span class="nx">manpath</span> <span class="o">=</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">&#39;.man.swp&#39;</span><span class="p">);</span>
+
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">manpath</span><span class="p">,</span> <span class="nx">ronn</span><span class="p">.</span><span class="nx">roff</span><span class="p">(),</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cb</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">ch</span> <span class="o">=</span> <span class="nx">spawn</span><span class="p">(</span><span class="s1">&#39;man&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nx">manpath</span><span class="p">],</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>soon deprecated, will have to use stdinStream, stdoutStream, and stderrStream instead</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">customFds</span><span class="o">:</span> <span class="p">[</span><span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">,</span> <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">,</span> <span class="nx">process</span><span class="p">.</span><span class="nx">stderr</span><span class="p">]</span>
+    <span class="p">});</span>
+
+    <span class="nx">ch</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="nx">cb</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">ext</span><span class="p">,</span> <span class="nx">code</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">code</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">),</span>
+    <span class="nx">sections</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="nx">reg</span> <span class="o">=</span> <span class="nx">matcher</span><span class="p">[</span><span class="nx">ext</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)],</span>
+    <span class="nx">save</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">line</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">arr</span><span class="p">)</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>push a new line if the prev line is not a comment</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">if</span><span class="p">(</span><span class="nx">reg</span> <span class="o">&amp;&amp;</span> <span class="nx">reg</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="nx">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nx">sections</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span><span class="p">(</span><span class="nx">reg</span> <span class="o">&amp;&amp;</span> <span class="nx">reg</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">line</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">sections</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">reg</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">));</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+
+  <span class="nx">lines</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">save</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">sections</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">parseMd</span><span class="p">(</span><span class="nx">content</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">delim</span> <span class="o">=</span> <span class="s1">&#39;&lt;code&gt;&#39;</span><span class="p">,</span>
+    <span class="nx">delimIn</span> <span class="o">=</span> <span class="nx">delim</span> <span class="o">+</span> <span class="s1">&#39;in&#39;</span><span class="p">,</span>
+    <span class="nx">delimOut</span> <span class="o">=</span> <span class="nx">delim</span> <span class="o">+</span> <span class="s1">&#39;out&#39;</span><span class="p">,</span>
+    <span class="nx">code</span><span class="p">;</span>
+
+  <span class="nx">content</span> <span class="o">=</span> <span class="nx">content</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/```.+/gm</span><span class="p">,</span> <span class="nx">delimIn</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/~~~.+/gm</span><span class="p">,</span> <span class="nx">delimIn</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/```/gm</span><span class="p">,</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span> <span class="nx">delimOut</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/~~~/gm</span><span class="p">,</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span> <span class="nx">delimOut</span><span class="p">);</span>
+
+  <span class="nx">content</span> <span class="o">=</span> <span class="nx">content</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">line</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">delimIn</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">line</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">delimIn</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+        <span class="nx">code</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">delimOut</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">line</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">delimOut</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+        <span class="nx">code</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="k">return</span> <span class="nx">code</span> <span class="o">?</span> <span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="nx">line</span> <span class="o">:</span> <span class="nx">line</span><span class="p">;</span>
+    <span class="p">});</span>
+
+
+  <span class="k">return</span> <span class="nx">content</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
