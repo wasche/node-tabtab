@@ -40,7 +40,7 @@ elif compctl &>/dev/null; then
                        2>/dev/null)) || return $?
     IFS="$si"
   }
-  compctl -K _{pkgname}_completion -f {pkgname}
+  compctl -K _{pkgname}_completion {pkgname}
 fi
 ###-end-{pkgname}-completion-###
 
